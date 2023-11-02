@@ -2,7 +2,7 @@
 
 Apache Tomcat, often referred to simply as Tomcat, is an open-source web server and servlet container developed by the Apache Software Foundation. It is designed to host and execute Java-based web applications, specifically those that use Java Servlet and JavaServer Pages (JSP) technologies.
 
-```markdown
+
 ## Install Tomcat
 
 ```bash
