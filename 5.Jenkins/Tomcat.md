@@ -68,4 +68,3 @@ Remember to replace the username and password in the `tomcat-users.xml` file wit
 
 ```
 
-This Markdown representation provides a more readable and organized guide for installing Tomcat and making the necessary configurations.
