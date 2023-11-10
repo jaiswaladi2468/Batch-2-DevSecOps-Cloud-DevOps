@@ -150,55 +150,56 @@ With this setup, the workflow will be executed on your self-hosted runner whenev
 An example GitHub Actions YAML file that performs Maven package, SonarQube analysis, OWASP dependency check, Docker build, and Docker image push:
 
 ```yaml
-name: CI/CD Pipeline
+
+
+name: CI-CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Set up Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: 11
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
 
-      - name: Build with Maven
-        run: mvn clean package
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t secret-santa .
+        docker tag secret-santa:latest adijaiswal/secret-santa:latest
+        docker push adijaiswal/secret-santa:latest
 
-      - name: SonarQube Analysis
-        uses: sonarsource/sonarqube-scan-action@v1
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}  # Set this secret in your repository settings
-          sonar-project-key: <your-sonar-project-key>
-          sonar-organization: <your-sonar-organization>
-          github-token: ${{ github.token }}
-
-      - name: OWASP Dependency Check
-        run: |
-          curl -fsSL -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v6.4.1/dependency-check-6.4.1-release.zip
-          unzip dependency-check.zip
-          cd dependency-check/bin
-          ./dependency-check.sh --scan <path-to-your-JAR-or-WAR-file>
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t your-docker-image-name .
-          docker tag your-docker-image-name:latest your-dockerhub-username/your-docker-image-name:latest
-          docker push your-dockerhub-username/your-docker-image-name:latest
+    - name: Analyze with SonarQube
+      uses: SonarSource/sonarqube-scan-action@7295e71c9583053f5bf40e9d4068a0c974603ec8
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}   
+        SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }} 
+      with:
+        args:
+          -Dsonar.projectKey=Secret-Santa
+          -Dsonar.java.binaries=.
 ```
 
 Here's what each step does:
