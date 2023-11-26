@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+data:
+  db_host: mongodb-service
+ 
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+type: Opaque
+data:
+  username: dXNlcm5hbWU=
+  password: cGFzc3dvcmQ=
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express
+        ports:
+        - containerPort: 8081
+        env:
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        - name: ME_CONFIG_MONGODB_SERVER 
+          valueFrom: 
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: db_host
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer  
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30000
