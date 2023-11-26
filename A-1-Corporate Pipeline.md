@@ -230,3 +230,39 @@ pipeline {
 }
 
 ```
+
+
+# Explaination
+
+Certainly! Here's an explanation of the Jenkins pipeline code block by block:
+
+### Agent and Tools Configuration
+- `agent { label 'VM' }`: Specifies that the Jenkins pipeline should run on a node labeled 'VM'.
+- `tools { maven 'Maven3' }`: Defines the tools needed for the build process. In this case, it specifies the use of Maven version 3.
+
+### Environment and Options
+- `environment { sonarEnv = 'SonarQube' }`: Sets the environment variable `sonarEnv` with the value `'SonarQube'`.
+- `options { buildDiscarder(logRotator(numToKeepStr: '3')) }`: Configures build options to discard old builds, keeping a maximum of 3 builds.
+
+### Stages
+The following stages outline different phases of the CI/CD pipeline:
+
+1. **Compile Stage**: Compiles source code and tests using Maven.
+2. **Unit Tests Stage**: Executes unit tests using Maven and Jacoco for code coverage.
+3. **Package Stage**: Packages the application using Maven.
+4. **OSS Compliance Stage**: Checks for Open Source Software (OSS) compliance using OWASP dependency checker.
+5. **Code Quality Check Stage**: Performs code quality checks with SonarQube.
+6. **Build and Upload Image Stage**: Builds a Docker image and uploads it to a registry.
+7. **Update Image Stream DEV Stage**: Updates the image stream in the development environment.
+8. **Deployment to DEV Stage**: Deploys the application to the development environment.
+9. **Image Security Test Stage**: Performs security tests using ZAP CLI.
+10. **Functional Tests Stage**: Runs functional tests, checks out test source code, and imports test results to XRay.
+11. **OWASP ZAP Security Analysis Stage**: Analyzes security using ZAP (Zed Attack Proxy).
+12. **Update Image Stream PROD Stage**: Updates the image stream in the production environment.
+13. **Deployment to PROD Stage**: Deploys the application to the production environment.
+
+### Post Actions
+- **Always**: Sends email notifications using `emailext` to specified recipients.
+- **Cleanup**: Cleans up the workspace by deleting it. (Disabled for now to reduce build time)
+
+This pipeline defines a series of stages that orchestrate the build, test, security analysis, and deployment of an application through various environments. Each stage encapsulates specific tasks to ensure the continuous integration and delivery of the software.
