@@ -185,24 +185,7 @@ pipeline {
         
         stage('Kubernetes'){
             steps{
-                withKubeConfig(caCertificate: '''-----BEGIN CERTIFICATE-----
-MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
-cm5ldGVzMB4XDTIzMDkxMTA2MzAxOFoXDTMzMDkwODA2MzAxOFowFTETMBEGA1UE
-AxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMCA
-wufr5BxHNinqKU4TATJilR7oT6jmBQm3SciWWFxYkPCTvDGHdgb7PFUmT/sNkf4z
-dBjTbAq8fB9yq5J2p3U7FINNPH8joB51ofTP+4vQnRjwNawn5POTzWbY9pmuZ2le
-zCE5FpmatveJ4tAXehjf6LQO2v1a3iD4kojctiat1JM5tOycNkteJmgb2nOlOLwO
-0jglz/5m/XlSu+DEBE3PNAL/o7edM5xR1ofrroNQ54W/dVfQwpfL7jfxxJ36rMna
-qOEClgJZk9uS6OmJFR5drMcuybyZOrWojZaBBvC5LzIERBlBKfcUH5RfmKqVUlb6
-Y1N8/cJWhnQhre8J9u0CAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB
-/wQFMAMBAf8wHQYDVR0OBBYEFNTtVjt47g0QG3Z17bUh+Xj8S1dGMA0GCSqGSIb3
-DQEBCwUAA4IBAQCcOI/DN9tjI1oy+i5iAqdQoRDXqHmkdkBVPYUx1TZ0H8it4ZYz
-Dz2CzxnUrsIpli7M/RiS/5ENtpIIGxqhAfXnjemkKjXEAa3hBCxEX3n7ReQsK8QH
-2HtyRdlDJwod/e1zSS3WnPMRfKQqXmmD1vZLzzbvdl+LSUtwat2C8Z3tNQsZDMPG
-vKwEuVYjIG3NSlgPLMVlbgIEgZq8sUYiYTHbiFO1WpeCczpTV0101BW+/kGWRsW+
-Y1yDb1xQ/6TrRbxj4fh/oq2dNq8Jgv3U79/mB1EevJZQudkB0pO9n7aRRietccNV
-ea4SsY9qI2mARJftAF2UbBgqMO6Ez5s5pPxF
------END CERTIFICATE-----''', clusterName: '', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.1.206:6443') {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://172.31.1.206:6443') {
     
         sh "kubectl apply -f deploymentservice.yml"
         sh "kubectl get pods"   
