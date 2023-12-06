@@ -2,6 +2,8 @@
 
 ### Step 1: Create IAM Policy
 ```bash
+mkdir folder && cd folder
+
 curl -o iam_policy_latest.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
 
 aws iam create-policy \
