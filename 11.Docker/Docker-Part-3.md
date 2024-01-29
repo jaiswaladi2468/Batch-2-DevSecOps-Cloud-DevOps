@@ -95,45 +95,42 @@ These are the three main types of Docker volumes, each with its own use cases. Y
 
 ## EXAMPLE
 
-You can use Docker Compose to set up a MongoDB container and a MongoDB Express (Mongo-Express) container with a Docker named volume. This example assumes you already have Docker and Docker Compose installed.
+You can use Docker Compose to set up a MongoDB container and a MongoDB Express (Mongo-Express) container. This example assumes you already have Docker and Docker Compose installed.
 
 Create a directory for your project and create a `docker-compose.yml` file inside it with the following content:
 
 ```yaml
-version: "3.5"
+version: '3'
+
 services:
   mongodb:
     image: mongo
     container_name: mongodb
-    volumes:
-      - db_data:/data/db
-    ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=rootuser
-      - MONGO_INITDB_ROOT_PASSWORD=rootpass
     networks:
-      - network
+      - mongo-network
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=123
+
   mongo-express:
     image: mongo-express
     container_name: mongo-express
-    ports:
-      - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    restart: unless-stopped
-    depends_on:
-      - mongodb
     networks:
-      - network
-networks:
-  network:
-    name: mongo-network
-volumes:
-  db_data:
+      - mongo-network
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=123
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=123
 
+networks:
+  mongo-network:
+    driver: bridge
 
 ```
 
